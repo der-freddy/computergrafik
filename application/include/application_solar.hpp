@@ -22,7 +22,7 @@ class ApplicationSolar : public Application {
   // draw all objects
   void render() const;
 
-  void uploadPlanetTransforms(Planet planet);
+  void uploadPlanetTransforms(Planet planet) const;
 
  protected:
   void initializeShaderPrograms();
