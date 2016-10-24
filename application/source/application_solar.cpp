@@ -29,16 +29,16 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 
 void ApplicationSolar::render() const {
 	// define planets
-	Planet Sun = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5});
-	Planet Mercury = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1});
-	Planet Venus = Planet(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12});
-	Planet Earth = Planet(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12});
-	Planet Mars = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09});
-	Planet Jupiter = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15});
-	Planet Saturn = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13});
-	Planet Uranus = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13});
-	Planet Neptune = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12});
-	Planet Pluto = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05});
+	Planet Sun = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f);
+	Planet Mercury = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f);
+	Planet Venus = Planet(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f);
+	Planet Earth = Planet(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f);
+	Planet Mars = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f);
+	Planet Jupiter = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f);
+	Planet Saturn = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f);
+	Planet Uranus = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f);
+	Planet Neptune = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f);
+	Planet Pluto = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f);
 
 	//put in vector
 	std::vector<Planet> solarSystem;
@@ -65,7 +65,7 @@ void ApplicationSolar::render() const {
 
 	}
 
-	glm::fmat4 moon = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f});
+	glm::fmat4 moon = glm::rotate(glm::fmat4{}, float(glfwGetTime()*0.9f), glm::vec3{0.0f, 1.0f, 0.0f});
 	moon = glm::translate(moon, glm::vec3{3.0f, 0.0f, 0.0f}) * glm::translate(moon, glm::vec3{0.2f, 0.0f, 0.0f}) ;
 	moon = glm::scale(moon,glm::vec3{0.03, 0.03, 0.03});
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
@@ -144,7 +144,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 
 void ApplicationSolar::uploadPlanetTransforms(Planet planet) const{
 
-	glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), planet.rotation_);
+	glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet.rotationSpeed_), planet.rotation_);
 	model_matrix = glm::translate(model_matrix, planet.translation_);
 	model_matrix = glm::scale(model_matrix, planet.scale_);
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),

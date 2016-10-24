@@ -48,15 +48,17 @@ struct shader_program {
 };
 
 struct Planet{
-  Planet(glm::fvec3 rotation = glm::fvec3(), glm::fvec3 translation = glm::fvec3(), glm::fvec3 scale = glm::fvec3())
+  Planet(glm::fvec3 rotation = glm::fvec3(), glm::fvec3 translation = glm::fvec3(), glm::fvec3 scale = glm::fvec3(), double rotationSpeed = 1.0f)
   {
     rotation_ = rotation;
     translation_ = translation;
     scale_ = scale;
+    rotationSpeed_ = rotationSpeed;
   }
 
   glm::fvec3 rotation_;
   glm::fvec3 translation_;
   glm::fvec3 scale_;
+  double rotationSpeed_;
 };
 #endif
