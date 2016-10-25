@@ -22,48 +22,24 @@ using namespace gl;
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
+ ,planets{}
 {
+
 	initializeGeometry();
 	initializeShaderPrograms();
+
+	planets = create_scene();
+
 }
 
 void ApplicationSolar::render() const {
 	// define planets
-	Planet Sun = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f);
-	Planet Mercury = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f);
-	Planet Venus = Planet(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f);
-	Planet Earth = Planet(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f);
-	Planet Mars = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f);
-	Planet Jupiter = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f);
-	Planet Saturn = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f);
-	Planet Uranus = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f);
-	Planet Neptune = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f);
-	Planet Pluto = Planet(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f);
 
-	//put in vector
-	std::vector<Planet> solarSystem;
-	solarSystem.push_back(Sun);
-	solarSystem.push_back(Mercury);
-	solarSystem.push_back(Venus);
-	solarSystem.push_back(Earth);
-	solarSystem.push_back(Mars);
-	solarSystem.push_back(Jupiter);
-	solarSystem.push_back(Saturn);
-	solarSystem.push_back(Uranus);
-	solarSystem.push_back(Neptune);
-	solarSystem.push_back(Pluto);
+	for(std::vector<std::shared_ptr<Planet>>::const_iterator i = planets.begin(); i != planets.end(); ++i)
+  	{
+    	uploadPlanetTransforms(*i);
+  	}
 
-	for(auto planet : solarSystem)
-	{
-		this->uploadPlanetTransforms(planet);
-	
-		// bind the VAO to draw
-		glBindVertexArray(planet_object.vertex_AO);
-
-		// draw bound vertex array using bound shader
-		glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-
-	}
 
 	glm::fmat4 moon = glm::rotate(glm::fmat4{}, float(glfwGetTime()*0.9f), glm::vec3{0.0f, 1.0f, 0.0f});
 	moon = glm::translate(moon, glm::vec3{3.0f, 0.0f, 0.0f}) * glm::translate(moon, glm::vec3{0.2f, 0.0f, 0.0f}) ;
@@ -142,19 +118,27 @@ void ApplicationSolar::initializeShaderPrograms() {
 	m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 }
 
-void ApplicationSolar::uploadPlanetTransforms(Planet planet) const{
+void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& planet) const{
 
-	glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet.rotationSpeed_), planet.rotation_);
-	model_matrix = glm::translate(model_matrix, planet.translation_);
-	model_matrix = glm::scale(model_matrix, planet.scale_);
-	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-										1, GL_FALSE, glm::value_ptr(model_matrix));
+	glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet->rotationSpeed_), planet->rotation_);
+
+	model_matrix = glm::translate(model_matrix, planet->translation_);
+
+	model_matrix = glm::scale(model_matrix, planet->scale_);
+
+	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),1, GL_FALSE, glm::value_ptr(model_matrix));
 
 
 	// extra matrix for normal transformation to keep them orthogonal to surface
 	glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-										 1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+	    // bind the VAO to draw
+    glBindVertexArray(planet_object.vertex_AO);
+
+    // draw bound vertex array using bound shader
+    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);  
 }
 
 
@@ -201,8 +185,40 @@ ApplicationSolar::~ApplicationSolar() {
 	glDeleteVertexArrays(1, &planet_object.vertex_AO);
 }
 
+std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
+
+	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f);
+	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f);
+	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f);
+	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f);
+	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f);
+	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f);
+	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f);
+	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f);
+	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f);
+	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f);
+
+		//put in vector
+	std::vector<std::shared_ptr<Planet>> solarSystem;
+
+	solarSystem.push_back(Sun);
+	solarSystem.push_back(Mercury);
+	solarSystem.push_back(Venus);
+	solarSystem.push_back(Earth);
+	solarSystem.push_back(Mars);
+	solarSystem.push_back(Jupiter);
+	solarSystem.push_back(Saturn);
+	solarSystem.push_back(Uranus);
+	solarSystem.push_back(Neptune);
+	solarSystem.push_back(Pluto);
+
+	return solarSystem;
+
+}
+
 // exe entry point
 int main(int argc, char* argv[]) {
+
 	
 	Launcher::run<ApplicationSolar>(argc, argv);
 }
