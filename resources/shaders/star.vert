@@ -7,7 +7,6 @@ layout(location = 1) in vec3 in_Color;
 //Matrix Uniforms as specified with glUniformMatrix4fv
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
-//uniform mat4 NormalMatrix;
 
 out vec3 pass_Color;
 
