@@ -142,6 +142,13 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
 	}
 }
 
+void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
+  // mouse handling
+  m_view_transform = glm::rotate(m_view_transform, (float)(pos_y/1000), glm::fvec3(-1.0f,0.0f,0.0f));
+  m_view_transform = glm::rotate(m_view_transform, (float)(pos_x/1000), glm::fvec3(0.0f,-1.0f,0.0f));
+  updateView();
+}
+
 // load shader programs
 void ApplicationSolar::initializeShaderPrograms() {
 	// store shader program objects in container
@@ -166,7 +173,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& planet) const{
 
 	glUseProgram(m_shaders.at("planet").handle);
-	
+
 	glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet->rotationSpeed_), planet->rotation_);
 
 	model_matrix = glm::translate(model_matrix, planet->translation_);
@@ -232,7 +239,7 @@ void ApplicationSolar::initializeGeometry() {
 	//initialization
 	srand(time(NULL));
 	//gererate stars
-	const unsigned numstars = 12000;
+	const unsigned numstars = 500000;
 	for(unsigned i = 0; i < numstars; ++i){
 	indices.push_back(i);
 	// generate position
