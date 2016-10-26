@@ -7,11 +7,14 @@ layout(location = 1) in vec3 in_Color;
 //Matrix Uniforms as specified with glUniformMatrix4fv
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
+//uniform mat4 NormalMatrix;
 
 out vec3 pass_Color;
 
-void main(void)
-{
-	gl_Position = (ProjectionMatrix  * ViewMatrix) * vec4(in_Position, 1.0);
-	pass_Color = in_Color;
+void main() {
+
+    gl_Position = (ProjectionMatrix * ViewMatrix ) 
+    	* vec4(in_Position, 1.0f);
+
+    pass_Color = in_Color;
 }

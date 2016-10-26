@@ -38,6 +38,9 @@ class ApplicationSolar : public Application {
   model_object planet_object;
   model_object star_object;
   std::vector<std::shared_ptr<Planet>> planets;
+
+  std::vector<float> stars;
+  std::vector<unsigned> indices;
 };
 
 #endif
