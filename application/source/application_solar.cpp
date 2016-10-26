@@ -243,7 +243,7 @@ void ApplicationSolar::initializeGeometry() {
 		num_stars.push_back(i);
 		// define pos via rand()
 		for(unsigned j=0;j<3;++j){
-	  		stars.push_back(static_cast <float>(15 + (rand() % 201 - 100)));
+	  		stars.push_back(static_cast <float>(10 + (rand() % 301- 200)));
 		}
 		// define color of stars
 		for(int k = 0; k < 3; ++k){
