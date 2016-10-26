@@ -20,6 +20,8 @@ class ApplicationSolar : public Application {
   void updateProjection();
   // react to key input
   void keyCallback(int key, int scancode, int action, int mods);
+
+  void mouseCallback(double pos_x, double pos_y);
   // draw all objects
   void render() const;
 
@@ -38,6 +40,9 @@ class ApplicationSolar : public Application {
   model_object planet_object;
   model_object star_object;
   std::vector<std::shared_ptr<Planet>> planets;
+
+  std::vector<float> stars;
+  std::vector<unsigned> num_stars;
 };
 
 #endif
