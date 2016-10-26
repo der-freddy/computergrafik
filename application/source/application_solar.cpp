@@ -235,37 +235,39 @@ void ApplicationSolar::initializeGeometry() {
 
 
 	// STARS
+	//rand num of stars
+	const unsigned numstars = 5000+(std::rand()%(10000-5000+1));
 
-	//initialization
-	srand( static_cast<unsigned int>(time(NULL)));
-	//gererate stars
-
-	const unsigned numstars = 6000;
-
-	for(unsigned i = 0; i < numstars; ++i){
-	num_stars.push_back(i);
-	// generate position
-	for(unsigned j = 0; j < 3; ++j){
-	  stars.push_back(static_cast <float>(15 + (rand() % 201 - 100)));
-	}
-	// generate colour
-	for(int k = 0; k < 3; ++k){
-	  stars.push_back(0.5f);
-	}
+	for(unsigned i=0;i<numstars;++i)
+	{
+		num_stars.push_back(i);
+		// define pos via rand()
+		for(unsigned j=0;j<3;++j){
+	  		stars.push_back(static_cast <float>(15 + (rand() % 201 - 100)));
+		}
+		// define color of stars
+		for(int k = 0; k < 3; ++k){
+	  		stars.push_back(0.5f);
+		}
 	}
 
-
+	// generate vertex array object
 	glGenVertexArrays(1, &star_object.vertex_AO);
+	// bind the array for attaching buffers
 	glBindVertexArray(star_object.vertex_AO);
 
+	// generate generic buffer
 	glGenBuffers(1, &star_object.vertex_BO);
+	// bind this as an vertex array buffer containing all attributes
 	glBindBuffer(GL_ARRAY_BUFFER, star_object.vertex_BO);
+	// configure currently bound array buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * stars.size(), stars.data() , GL_STATIC_DRAW);
 
-	//position
+	//enable position on gpu
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6.0f, NULL); //index, num_components, data_type, normalize, stride, offset
-	//color
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6.0f, NULL);
+	
+	//enable colors on gpu
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6.0f, (GLvoid*)uintptr_t(sizeof(float)*3));
 
@@ -273,6 +275,8 @@ void ApplicationSolar::initializeGeometry() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, star_object.element_BO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * numstars, num_stars.data(), GL_STATIC_DRAW);
 
+
+	//draw stars
 	star_object.draw_mode = GL_POINTS;
 	star_object.num_elements = GLsizei(numstars);
 }
@@ -282,6 +286,7 @@ ApplicationSolar::~ApplicationSolar() {
 	glDeleteBuffers(1, &planet_object.element_BO);
 	glDeleteVertexArrays(1, &planet_object.vertex_AO);
 
+	//destroy
 	glDeleteBuffers(1, &star_object.vertex_BO);
 	glDeleteBuffers(1, &star_object.element_BO);
 	glDeleteVertexArrays(1, &star_object.vertex_AO);
