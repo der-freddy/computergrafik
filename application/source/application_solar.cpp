@@ -25,7 +25,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,star_object{}
  ,planets{}
  ,stars{}
- ,indices{}
+ ,num_stars{}
 {
 
 	initializeGeometry();
@@ -230,19 +230,18 @@ void ApplicationSolar::initializeGeometry() {
 	// STARS
 
 	//initialization
-	srand(time(NULL));
+	srand( static_cast<unsigned int>(time(NULL)));
 	//gererate stars
-	const unsigned numstars = 12000;
+	const unsigned numstars = 6000;
 	for(unsigned i = 0; i < numstars; ++i){
-	indices.push_back(i);
+	num_stars.push_back(i);
 	// generate position
 	for(unsigned j = 0; j < 3; ++j){
 	  stars.push_back(static_cast <float>(15 + (rand() % 201 - 100)));
 	}
 	// generate colour
 	for(int k = 0; k < 3; ++k){
-	  //stars.push_back(0.8f);
-	  stars.push_back(float(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
+	  stars.push_back(0.5f);
 	}
 	}
 
@@ -256,14 +255,14 @@ void ApplicationSolar::initializeGeometry() {
 
 	//position
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, NULL); //index, num_components, data_type, normalize, stride, offset
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6.0f, NULL); //index, num_components, data_type, normalize, stride, offset
 	//color
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6, (GLvoid*)uintptr_t(sizeof(float)*3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6.0f, (GLvoid*)uintptr_t(sizeof(float)*3));
 
 	glGenBuffers(1, &star_object.element_BO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, star_object.element_BO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * numstars, indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * numstars, num_stars.data(), GL_STATIC_DRAW);
 
 	star_object.draw_mode = GL_POINTS;
 	star_object.num_elements = GLsizei(numstars);

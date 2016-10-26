@@ -40,7 +40,7 @@ class ApplicationSolar : public Application {
   std::vector<std::shared_ptr<Planet>> planets;
 
   std::vector<float> stars;
-  std::vector<unsigned> indices;
+  std::vector<unsigned> num_stars;
 };
 
 #endif
