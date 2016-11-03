@@ -270,6 +270,7 @@ void ApplicationSolar::initializeGeometry() {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6.0f, (GLvoid*)uintptr_t(sizeof(float)*3));
 
+	
 	glGenBuffers(1, &star_object.element_BO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, star_object.element_BO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * numstars, num_stars.data(), GL_STATIC_DRAW);
