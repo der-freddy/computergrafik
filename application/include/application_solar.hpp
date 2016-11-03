@@ -4,6 +4,7 @@
 #include "application.hpp"
 #include "model.hpp"
 #include "structs.hpp"
+#include "planet.hpp"
 #include <memory>
 
 // gpu representation of model

@@ -6,6 +6,8 @@
 #include <glbinding/gl/gl.h>
 #include <glm/gtc/type_precision.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 // use gl definitions from glbinding 
 using namespace gl;
 
@@ -48,21 +50,4 @@ struct shader_program {
   std::map<std::string, GLint> u_locs{};
 };
 
-struct Planet{
-  Planet(glm::fvec3 rotation = glm::fvec3(), glm::fvec3 translation = glm::fvec3(), glm::fvec3 scale = glm::fvec3(), double rotationSpeed = 1.0f, std::shared_ptr<Planet> ref_pl = nullptr)
-  {
-    rotation_ = rotation;
-    translation_ = translation;
-    scale_ = scale;
-    rotationSpeed_ = rotationSpeed;
-    ref_pl_ = ref_pl;
-
-  }
-
-  glm::fvec3 rotation_;
-  glm::fvec3 translation_;
-  glm::fvec3 scale_;
-  double rotationSpeed_;
-  std::shared_ptr<Planet> ref_pl_;
-};
 #endif

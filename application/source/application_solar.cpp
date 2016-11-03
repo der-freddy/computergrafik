@@ -56,17 +56,17 @@ void ApplicationSolar::render() const {
 
 	glUseProgram(m_shaders.at("planet").handle);
 
-  	glm::fmat4 moon = glm::rotate(glm::fmat4{}, float(glfwGetTime()*0.9f), glm::vec3{0.0f, 1.0f, 0.0f});
-	moon = glm::translate(moon, glm::vec3{3.0f, 0.0f, 0.0f}) * glm::translate(moon, glm::vec3{0.2f, 0.0f, 0.0f}) ;
-	moon = glm::scale(moon,glm::vec3{0.03, 0.03, 0.03});
-	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-										1, GL_FALSE, glm::value_ptr(moon));
+ //  	glm::fmat4 moon = glm::rotate(glm::fmat4{}, float(glfwGetTime()*0.9f), glm::vec3{0.0f, 1.0f, 0.0f});
+	// moon = glm::translate(moon, glm::vec3{3.0f, 0.0f, 0.0f}) * glm::translate(moon, glm::vec3{0.2f, 0.0f, 0.0f}) ;
+	// moon = glm::scale(moon,glm::vec3{0.03, 0.03, 0.03});
+	// glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+	// 									1, GL_FALSE, glm::value_ptr(moon));
 
 
-	// extra matrix for normal transformation to keep them orthogonal to surface
-	glm::fmat4 normal_moon = glm::inverseTranspose(glm::inverse(m_view_transform) * moon);
-	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-										 1, GL_FALSE, glm::value_ptr(normal_moon));
+	// // extra matrix for normal transformation to keep them orthogonal to surface
+	// glm::fmat4 normal_moon = glm::inverseTranspose(glm::inverse(m_view_transform) * moon);
+	// glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+	// 									 1, GL_FALSE, glm::value_ptr(normal_moon));
 
 	// bind the VAO to draw
 	glBindVertexArray(planet_object.vertex_AO);
@@ -178,17 +178,21 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 	glUseProgram(m_shaders.at("planet").handle);
 
-	glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet->rotationSpeed_), planet->rotation_);
+	glm::fmat4 matrix;
 
-	model_matrix = glm::translate(model_matrix, planet->translation_);
+	matrix *= model_matrix(planet);
 
-	model_matrix = glm::scale(model_matrix, planet->scale_);
+//	model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet->rotationSpeed_), planet->rotation_);
 
-	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),1, GL_FALSE, glm::value_ptr(model_matrix));
+//	model_matrix = glm::translate(model_matrix, planet->translation_);
+
+	matrix = glm::scale(matrix, planet->scale_);
+
+	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),1, GL_FALSE, glm::value_ptr(matrix));
 
 
 	// extra matrix for normal transformation to keep them orthogonal to surface
-	glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+	glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * matrix);
 
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),1, GL_FALSE, glm::value_ptr(normal_matrix));
 
@@ -310,7 +314,7 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, Sun);
 	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, Sun);
 	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, Sun);
-	//std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.1f, Earth);
+	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, Earth);
 	//put planets in vector
 	std::vector<std::shared_ptr<Planet>> solarSystem;
 
@@ -324,6 +328,7 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	solarSystem.push_back(Uranus);
 	solarSystem.push_back(Neptune);
 	solarSystem.push_back(Pluto);
+	solarSystem.push_back(Moon);
 
 	return solarSystem;
 
