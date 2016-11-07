@@ -307,10 +307,10 @@ ApplicationSolar::~ApplicationSolar() {
 std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 
 	//create planets & moons
-	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{0.5, 0.5, 0.5},nullptr);
+	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{1.0, 0.5, 0.2},nullptr);
 	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.5, 0.5, 0.5},Sun);
 	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.5, 0.5, 0.5},Sun);
-	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.5, 0.5, 0.5},Sun);
+	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.0, 0.0, 0.5},Sun);
 	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.5, 0.5, 0.5},Sun);
 	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.5, 0.5, 0.5},Sun);
 	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.5, 0.5, 0.5},Sun);
