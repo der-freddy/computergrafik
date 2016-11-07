@@ -163,6 +163,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 	m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
 	m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
 	m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+	m_shaders.at("planet").u_locs["PlanetColor"] = -1;
 
 	m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
 																					 m_resource_path + "shaders/star.frag"});
@@ -196,7 +197,7 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),1, GL_FALSE, glm::value_ptr(normal_matrix));
 
-	glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planet->color_.x, planet->color_.y, planet->color_.z); 
+	glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planet->color_.x,planet->color_.y, planet->color_.z); 
 
 	    // bind the VAO to draw
     glBindVertexArray(planet_object.vertex_AO);

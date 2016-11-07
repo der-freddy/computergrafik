@@ -17,5 +17,6 @@ void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
 	//pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
-	pass_Ńormal = PlanetColor;
+	pass_Normal = PlanetColor;
+
 }
