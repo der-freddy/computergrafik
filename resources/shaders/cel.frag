@@ -21,24 +21,27 @@ void main(void)
 
     vec3 h = normalize(pass_LightVector.xyz + pass_ViewerVector);
 
-    // Calculation of the angle
+    // angle
     float outlineAngle = dot(pass_Normal, pass_ViewerVector);
 
-    // draw border around planet
+    //border
     if ( (outlineAngle >= 0.0f) && (outlineAngle <= 0.3f)) {
       out_Color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
-    } else {
+    } 
+    else{
+      
       // Ambient Light
       vec3   A = ka * ia;
+      
       // Defuse Light
       vec3   D = kd * id;
       float df = max(0.0f, dot(pass_LightVector, pass_Normal) );
+      
       // Specular Light
       vec3   S = ks * is;
       float sf = max(0.0f, dot(pass_Normal, h));
             sf = pow(sf, shininess);
 
-      // Do crazy stuff for cel-shading
       df = ceil(df * factor) / factor;
       sf = ceil(sf * factor) / factor;
 

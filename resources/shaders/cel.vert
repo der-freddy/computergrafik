@@ -11,7 +11,7 @@ uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
 uniform vec3 ColorVector;
 
-uniform vec3 LightSource;
+uniform vec3 LightVector;
 
 out vec3 pass_Normal;
 out vec3 pass_Color;
@@ -24,10 +24,9 @@ void main(void)
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f);
 	pass_Normal = normalize((NormalMatrix * vec4(in_Normal, 0.0f)).xyz);
 
-//  vec4 planet_Position = inverse(ViewMatrix) * vec4(in_Position, 1.0f);
-  vec3 planet_Position = vec3((ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f));
-  pass_LightVector = normalize(LightSource - planet_Position.xyz);
+	vec3 planet_Position = vec3((ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f));
+  	pass_LightVector = normalize(LightVector - planet_Position.xyz);
 
-  pass_ViewerVector = normalize(- planet_Position.xyz);
+	pass_ViewerVector = normalize(- planet_Position.xyz);
 	pass_Color  = ColorVector;
 }
