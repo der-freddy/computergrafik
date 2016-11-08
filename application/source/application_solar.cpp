@@ -65,8 +65,6 @@ void ApplicationSolar::render() const {
 
 void ApplicationSolar::updateView() {
 
-
-
 	if(cel == false)
 	{
 		m_shaders.emplace("planet", shader_program{m_resource_path + "shaders/simple.vert",m_resource_path + "shaders/simple.frag"});
@@ -75,12 +73,6 @@ void ApplicationSolar::updateView() {
 	{
 		m_shaders.emplace("planet_cel", shader_program{m_resource_path + "shaders/cel.vert",m_resource_path + "shaders/cel.frag"});	
 	}
-
-
-
-
-
-
 
 	// vertices are transformed in camera space, so camera transform must be inverted
 	glm::fmat4 view_matrix = glm::inverse(m_view_transform);
