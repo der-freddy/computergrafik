@@ -12,13 +12,15 @@ uniform mat4 NormalMatrix;
 uniform vec3 PlanetColor;
 uniform float Glossyness;
 uniform vec3 SunPosition;
-out vec3 planetPosition;
+uniform uint Shader;
 
+out vec3 planetPosition;
 out vec3 pass_Normal;
 out vec3 pass_Color;
 out float pass_Glossyness;
 out vec3 pass_lightRay;
 out vec3 pass_Viewer;
+flat out uint pass_Shader;
 
 void main(void)
 {
@@ -33,4 +35,6 @@ void main(void)
 
 	pass_Color = PlanetColor;
 	pass_Glossyness = Glossyness;
+
+	pass_Shader = Shader;
 }

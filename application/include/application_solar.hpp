@@ -31,6 +31,8 @@ class ApplicationSolar : public Application {
 
   void uploadPlanetTransforms(std::shared_ptr<Planet> const& planet) const;
 
+  //Update shader
+  void updateShader(uint shader);
 
  protected:
   void initializeShaderPrograms();
@@ -44,6 +46,7 @@ class ApplicationSolar : public Application {
 
   std::vector<float> stars;
   std::vector<unsigned> num_stars;
+  std::string shadername = "planet";
 };
 
 #endif

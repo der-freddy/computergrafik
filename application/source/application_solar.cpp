@@ -19,8 +19,6 @@ using namespace gl;
 
 #include <iostream>
 
-bool cel = false;
-std::string shadername = "planet";
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
@@ -65,34 +63,17 @@ void ApplicationSolar::render() const {
 
 void ApplicationSolar::updateView() {
 
-
-
-	if(cel == false)
-	{
-		m_shaders.emplace("planet", shader_program{m_resource_path + "shaders/simple.vert",m_resource_path + "shaders/simple.frag"});
-	}
-	else
-	{
-		m_shaders.emplace("planet_cel", shader_program{m_resource_path + "shaders/cel.vert",m_resource_path + "shaders/cel.frag"});	
-	}
-
-
-
-
-
-
-
 	// vertices are transformed in camera space, so camera transform must be inverted
 	glm::fmat4 view_matrix = glm::inverse(m_view_transform);
 
 	// upload matrix to gpu
-	glUniformMatrix4fv(m_shaders.at(shadername).u_locs.at("ViewMatrix"),
+	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ViewMatrix"),
 										 1, GL_FALSE, glm::value_ptr(view_matrix));
 
 	//change sun position
 	glm::fvec4 sun_pos = glm::fvec4(0.0f,0.0f,0.0f,1.0f);
 	sun_pos = view_matrix * sun_pos;
-	auto loc = glGetUniformLocation(m_shaders.at(shadername).handle,"SunPosition");
+	auto loc = glGetUniformLocation(m_shaders.at("planet").handle,"SunPosition");
 	glUniform3f(loc, sun_pos.x, sun_pos.y, sun_pos.z);
 
 	//set shader to star shader
@@ -100,7 +81,7 @@ void ApplicationSolar::updateView() {
 	glUniformMatrix4fv(m_shaders.at("star").u_locs.at("ViewMatrix"),
 	             1, GL_FALSE, glm::value_ptr(view_matrix));
 
-	glUseProgram(m_shaders.at(shadername).handle);
+	glUseProgram(m_shaders.at("planet").handle);
 }
 
 void ApplicationSolar::updateProjection() {
@@ -155,16 +136,19 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
 		updateView();
 	}
 	else if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-		cel = false;
-		updateView();
+
+		updateShader(0);
 	}
 	else if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		cel = true;
-		updateView();
+
+		updateShader(1);
 	}
+}
 
+void ApplicationSolar::updateShader(uint shader) {
 
-
+	auto a = glGetUniformLocation(m_shaders.at("planet").handle,"Shader");
+	glUniform1ui(a, shader);
 }
 
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
@@ -335,17 +319,17 @@ ApplicationSolar::~ApplicationSolar() {
 std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	//create planets & moons
 
-	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{1.0, 0.5, 0.2}, 1.0f, nullptr);
-	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.2, 0.2, 0.6}, 1.0f,Sun);
-	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.1, 0.5, 0.2}, 1.0f,Sun);
-	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.7, 0.2, 0.4}, 0.5f, Sun);
-	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.8, 0.1, 0.7}, 1.0f, Sun);
-	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.9, 0.1, 0.4}, 1.0f, Sun);
-	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.6, 0.9, 0.3}, 1.0f, Sun);
-	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, glm::vec3{0.2, 0.1, 0.9}, 1.0, Sun);
-	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.4, 0.8, 0.9}, 1.0f, Sun);
-	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 1.0f, Sun);
-	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.4, 0.4, 0.4}, 1.0f, Earth);
+	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{1.0, 0.5, 0.2}, 6.0f, nullptr);
+	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.2, 0.2, 0.6}, 6.0f,Sun);
+	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.1, 0.5, 0.2}, 6.0f,Sun);
+	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.7, 0.2, 0.4}, 6.5f, Sun);
+	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.8, 0.1, 0.7}, 6.0f, Sun);
+	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.9, 0.1, 0.4}, 6.0f, Sun);
+	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.6, 0.9, 0.3}, 6.0f, Sun);
+	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, glm::vec3{0.2, 0.1, 0.9}, 6.0, Sun);
+	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.4, 0.8, 0.9}, 6.0f, Sun);
+	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 6.0f, Sun);
+	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.4, 0.4, 0.4}, 6.0f, Earth);
 
 	//put planets in vector
 	std::vector<std::shared_ptr<Planet>> solarSystem;
