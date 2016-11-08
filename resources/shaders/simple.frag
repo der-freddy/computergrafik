@@ -4,7 +4,7 @@ in  vec3 pass_Normal;
 in  vec3 pass_Color;
 in  float pass_Glossyness;
 in  vec3 pass_lightRay;
-in  vec3 pass_viewerVector;
+in  vec3 pass_Viewer;
 
 
 out  vec4 out_Color;
@@ -18,7 +18,7 @@ void main() {
 	vec3 id = vec3(0.4, 0.4, 0.4);
 	vec3 is = vec3(0.6, 0.6, 0.6);
 
-	vec3 h = normalize(pass_lightRay + pass_viewerVector);
+	vec3 h = normalize(pass_lightRay + pass_Viewer);
 
 	vec3 a = ka * ia;
 	vec3 d = kd * id * max(0.0f, dot(normalize(pass_Normal), pass_lightRay));
