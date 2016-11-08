@@ -15,7 +15,7 @@ void main() {
 	vec3 ks = vec3(1.0, 1.0, 1.0);
 
 	vec3 ia = vec3(0.4, 0.4, 0.4);
-	vec3 id = vec3(0.7, 0.7, 0.7);
+	vec3 id = vec3(0.4, 0.4, 0.4);
 	vec3 is = vec3(0.6, 0.6, 0.6);
 
 	vec3 h = normalize(pass_lightRay + pass_viewerVector);

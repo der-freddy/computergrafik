@@ -11,6 +11,7 @@ uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
 uniform vec3 PlanetColor;
 uniform float Glossyness;
+uniform vec3 SunPosition;
 out vec3 planetPosition;
 
 out vec3 pass_Normal;
@@ -25,8 +26,8 @@ void main(void)
 	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
 
 
-	planetPosition = vec3(ModelMatrix * vec4(in_Position, 1.0));
-	pass_lightRay = normalize(vec3(0.0, 0.0, 0.0) - planetPosition);
+	planetPosition = vec3(ViewMatrix * ModelMatrix * vec4(in_Position, 1.0));
+	pass_lightRay = normalize(SunPosition - planetPosition.xyz);
 
 	pass_Viewer = normalize(-planetPosition.xyz);
 

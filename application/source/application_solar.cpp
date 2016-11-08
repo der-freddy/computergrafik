@@ -83,6 +83,12 @@ void ApplicationSolar::updateView() {
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ViewMatrix"),
 										 1, GL_FALSE, glm::value_ptr(view_matrix));
 
+	//change sun position
+	glm::fvec4 sun_pos = glm::fvec4(0.0f,0.0f,0.0f,1.0f);
+	sun_pos = view_matrix * sun_pos;
+	auto loc = glGetUniformLocation(m_shaders.at("planet").handle,"SunPosition");
+	glUniform3f(loc, sun_pos.x, sun_pos.y, sun_pos.z);
+
 	//set shader to star shader
 	glUseProgram(m_shaders.at("star").handle);
 	glUniformMatrix4fv(m_shaders.at("star").u_locs.at("ViewMatrix"),
@@ -169,7 +175,6 @@ void ApplicationSolar::initializeShaderPrograms() {
 	m_shaders.at("planet").u_locs["Glossyness"] = -1;
 
 
-
 	m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
 																					 m_resource_path + "shaders/star.frag"});
 	//inizialise star shader
@@ -188,9 +193,6 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 	matrix *= model_matrix(planet);
 
-//	model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()*planet->rotationSpeed_), planet->rotation_);
-
-//	model_matrix = glm::translate(model_matrix, planet->translation_);
 
 	matrix = glm::scale(matrix, planet->scale_);
 
@@ -204,9 +206,6 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 	glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planet->color_.x,planet->color_.y, planet->color_.z); 
 
-	//glUniform3f(m_shaders.at("planet").u_locs.at("PlanetDiffuse"), planet->color_.x,planet->color_.y, planet->color_.z); 
-
-	//glUniform3f(m_shaders.at("planet").u_locs.at("PlanetSpecular"), 1.0f, 1.0f, 1.0f); 
 
 	glUniform1f(m_shaders.at("planet").u_locs.at("Glossyness"), planet->glossyness_); 
 
@@ -321,17 +320,17 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	//create planets & moons
 
 
-	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, nullptr);
-	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.5, 0.5, 0.5}, 5.0f,Sun);
-	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.5, 0.5, 0.5}, 5.0f,Sun);
-	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Sun);
-	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.5, 0.5, 0.5}, 5.0f, Earth);
+	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, nullptr);
+	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.5, 0.5, 0.5}, 8.0f,Sun);
+	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.5, 0.5, 0.5}, 8.0f,Sun);
+	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Sun);
+	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.5, 0.5, 0.5}, 8.0f, Earth);
 
 
 	//put planets in vector
