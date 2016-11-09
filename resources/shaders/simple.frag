@@ -22,9 +22,12 @@ void main() {
 		vec3 is = vec3(0.6, 0.6, 0.6);
 	
 		vec3 h = normalize(pass_lightRay + pass_Viewer);
+		//Ambient
 		vec3 a = ka * ia;
+		//Diffuse
 		vec3 d = kd * id * max(0.0f, dot(normalize(pass_Normal), pass_lightRay));
 		float sTemp = max(0.0f, dot(normalize(pass_Normal), h));
+		//Specular
 		vec3 s = ks * is * pow(sTemp, pass_Glossyness);
 
 	  
@@ -47,23 +50,23 @@ void main() {
 		float outlineAngle = dot(pass_Normal, pass_Viewer);
 
 		//border
-		if ( (outlineAngle >= 0.0f) && (outlineAngle <= 0.3f)) {
-			out_Color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		if ( (outlineAngle >= 0.0f) && (outlineAngle <= 0.5f)) {
+			out_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		} 
 		else
 		{
 
-			// Ambient Light
+			// Ambient
 			vec3   A = ka * ia;
 
-			// Defuse Light
+			// Defuse 
 			vec3   D = kd * id;
 			float df = max(0.0f, dot(pass_lightRay, pass_Normal) );
 
-			// Specular Light
+			// Specular
 			vec3   S = ks * is;
 			float sf = max(0.0f, dot(pass_Normal, h));
-			sf = pow(sf, shininess);
+			sf = pow(sf,  pass_Glossyness);
 
 			df = ceil(df * factor) / factor;
 			sf = ceil(sf * factor) / factor;

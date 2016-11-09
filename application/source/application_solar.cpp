@@ -164,7 +164,6 @@ void ApplicationSolar::initializeShaderPrograms() {
 	// store shader program objects in container
 	
 	m_shaders.emplace("planet", shader_program{m_resource_path + "shaders/simple.vert",m_resource_path + "shaders/simple.frag"});
-	m_shaders.emplace("planet", shader_program{m_resource_path + "shaders/cel.vert",m_resource_path + "shaders/cel.frag"});
 
 
 	// request uniform locations for shader program
