@@ -16,8 +16,8 @@ uniform vec3 LightVector;
 out vec3 pass_Normal;
 out vec3 pass_Color;
 
-out vec3  pass_LightVector;
-out vec3  pass_ViewerVector;
+out vec3 pass_LightVector;
+out vec3 pass_ViewerVector;
 
 void main(void)
 {

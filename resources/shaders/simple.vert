@@ -31,7 +31,7 @@ void main(void)
 	planetPosition = vec3((ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0));
 	pass_lightRay = normalize(SunPosition - planetPosition.xyz);
 
-	pass_Viewer = normalize(pass_lightRay-planetPosition.xyz);
+	pass_Viewer = (-planetPosition.xyz);
 
 	pass_Color = PlanetColor;
 	pass_Glossyness = Glossyness;
