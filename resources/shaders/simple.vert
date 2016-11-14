@@ -27,9 +27,10 @@ void main(void)
 	gl_Position = (ProjectionMatrix * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
 	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
 
+	vec3 LightPosition = vec3(0.0,0.0,0.0);
 
-	planetPosition = vec3((ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0));
-	pass_lightRay = normalize(SunPosition - planetPosition.xyz);
+	planetPosition = vec3((ModelMatrix) * vec4(in_Position, 1.0));
+	pass_lightRay = normalize(LightPosition - planetPosition);;
 
 	pass_Viewer = normalize(pass_lightRay-planetPosition.xyz);
 
