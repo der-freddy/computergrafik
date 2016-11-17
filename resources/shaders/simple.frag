@@ -28,7 +28,7 @@ void main() {
 		vec3 d = kd * id * max(0.0f, dot(normalize(pass_Normal), pass_lightRay));
 		float sTemp = max(0.0f, dot(normalize(pass_Normal), h));
 		//Specular
-		vec3 s = ks * is * pow(sTemp, pass_Glossyness);
+		vec3 s = ks * is * pow(sTemp, pass_Glossyness*2.5);
 
 	  
 	  	out_Color = vec4(a + d + s, 1.0f);
