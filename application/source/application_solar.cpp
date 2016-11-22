@@ -174,7 +174,8 @@ void ApplicationSolar::initializeShaderPrograms() {
 	m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 	m_shaders.at("planet").u_locs["PlanetColor"] = -1;
 	m_shaders.at("planet").u_locs["Glossyness"] = -1;
- 
+
+
 	m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
 																					 m_resource_path + "shaders/star.frag"});
 	//inizialise star shader
@@ -196,7 +197,7 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 	glUniform1i(color_sampler_location, i);
 
 	glm::fmat4 matrix;
- 
+
 	matrix *= model_matrix(planet);
 
 
