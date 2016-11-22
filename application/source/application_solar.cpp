@@ -339,6 +339,7 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	auto tNeptune = utils::create_texture_object(texture_loader::file(tPath + "neptunemap.png"));
 	auto tPluto = utils::create_texture_object(texture_loader::file(tPath + "moonmap1k.png"));
 	auto tMoon = utils::create_texture_object(texture_loader::file(tPath + "moonmap1k.png"));
+	auto tSky = utils::create_texture_object(texture_loader::file(tPath + "stars.png"));
 
 	//create planets & moons
 
@@ -353,7 +354,7 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.4, 0.8, 0.9}, 6.0f, Sun,tNeptune);
 	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 6.0f, Sun,tPluto);
 	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.4, 0.4, 0.4}, 6.0f, Earth,tMoon);
-
+	std::shared_ptr<Planet> Sky = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{20.0, 20.0, 20.0}, 0.0f, glm::vec3{0.0,0.0,0.0}, 6.0f, nullptr,tSky);
 	//put planets in vector
 	std::vector<std::shared_ptr<Planet>> solarSystem;
 
@@ -368,6 +369,7 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	solarSystem.push_back(Neptune);
 	solarSystem.push_back(Pluto);
 	solarSystem.push_back(Moon);
+	solarSystem.push_back(Sky);
 
 	return solarSystem;
 }
