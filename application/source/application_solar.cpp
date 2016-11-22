@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "shader_loader.hpp"
 #include "model_loader.hpp"
+#include "texture_loader.hpp"
 
 #include <glbinding/gl/gl.h>
 // use gl definitions from glbinding 
@@ -26,10 +27,12 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,planets{}
  ,stars{}
  ,num_stars{}
+ ,textures{}
 {
 
 	initializeGeometry();
 	initializeShaderPrograms();
+	initializeTextures();
 
 	planets = create_scene();
 
@@ -302,6 +305,36 @@ void ApplicationSolar::initializeGeometry() {
 	//draw stars
 	star_object.draw_mode = GL_POINTS;
 	star_object.num_elements = GLsizei(numstars);
+}
+
+void ApplicationSolar::initializeTextures()
+{
+	std::string texturesDir = m_resource_path+"textures/";
+
+	auto tSun = texture_loader::file(texturesDir+"sunmap.jpg");
+	auto tMercury = texture_loader::file(texturesDir+"mercurymap.jpg");
+	auto tVenus = texture_loader::file(texturesDir+"venusmap.jpg");
+	auto tEarth = texture_loader::file(texturesDir+"earthmap1k.jpg");
+	auto tMars = texture_loader::file(texturesDir+"mars_1k_color.jpg");
+	auto tJupiter = texture_loader::file(texturesDir+"jupitermap.jpg");
+	auto tSaturn = texture_loader::file(texturesDir+"saturnmap.jpg");
+	auto tUranus = texture_loader::file(texturesDir+"uranusmap.jpg");
+	auto tNeptune = texture_loader::file(texturesDir+"neptunemap.jpg");
+	auto tPluto = texture_loader::file(texturesDir+"plutomap1k.jpg");
+	auto tMoon = texture_loader::file(texturesDir+"moonmap1k.jpg");
+
+	textures.push_back(utils::create_texture_object(tSun));
+	textures.push_back(utils::create_texture_object(tMercury));
+	textures.push_back(utils::create_texture_object(tVenus));
+	textures.push_back(utils::create_texture_object(tEarth));
+	textures.push_back(utils::create_texture_object(tMars));
+	textures.push_back(utils::create_texture_object(tJupiter));
+	textures.push_back(utils::create_texture_object(tSaturn));
+	textures.push_back(utils::create_texture_object(tUranus));
+	textures.push_back(utils::create_texture_object(tPluto));
+	textures.push_back(utils::create_texture_object(tMoon));
+
+
 }
 
 ApplicationSolar::~ApplicationSolar() {

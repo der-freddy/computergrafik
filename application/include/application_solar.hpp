@@ -37,6 +37,7 @@ class ApplicationSolar : public Application {
  protected:
   void initializeShaderPrograms();
   void initializeGeometry();
+  void initializeTextures();
   void updateView();
 
   // cpu representation of model
@@ -47,6 +48,9 @@ class ApplicationSolar : public Application {
   std::vector<float> stars;
   std::vector<unsigned> num_stars;
   std::string shadername = "planet";
+
+  std::vector<texture_object> textures;
+  GLuint texture_handle;
 };
 
 #endif
