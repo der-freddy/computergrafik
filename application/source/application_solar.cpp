@@ -329,7 +329,7 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	std::string tPath = m_resource_path + "textures/";
 
 	auto tSun = utils::create_texture_object(texture_loader::file(tPath + "sunmap.png"));
-	auto tMercury = utils::create_texture_object(texture_loader::file(tPath + "mercurymap.png"));
+	auto tMercury = utils::create_texture_object(texture_loader::file(tPath + "deathstar.png"));
 	auto tVenus = utils::create_texture_object(texture_loader::file(tPath + "venusmap.png"));
 	auto tEarth = utils::create_texture_object(texture_loader::file(tPath + "earthmap1k.png"));
 	auto tMars = utils::create_texture_object(texture_loader::file(tPath + "marsmap1k.png"));
