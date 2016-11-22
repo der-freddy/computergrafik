@@ -6,6 +6,7 @@
 #include "structs.hpp"
 #include "planet.hpp"
 #include <memory>
+#include "texture_loader.hpp"
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -36,9 +37,13 @@ class ApplicationSolar : public Application {
 
  protected:
   void initializeShaderPrograms();
+  void initializeTextures();
   void initializeGeometry();
   void initializeTextures();
   void updateView();
+
+  GLuint textureHandle;
+  std::vector<texture_object> textures;
 
   // cpu representation of model
   model_object planet_object;

@@ -15,6 +15,12 @@ namespace utils {
 texture_object create_texture_object(pixel_data const& tex) {
   texture_object t_obj{};
 
+  glGenTextures(1, &textureHandle);
+  glBindTexture(GL_TEXTURE_2D, textureHandle);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLint(GL_LINEAR));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLint(GL_LINEAR));
+  glTexImage2D(GL_TEXTURE_2D, 0, GLint(GL_RGB8), 1024, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
   throw std::logic_error("Texture Object creation not implemented yet");
 
   return t_obj;

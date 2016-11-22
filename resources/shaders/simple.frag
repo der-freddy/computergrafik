@@ -1,18 +1,19 @@
 #version 150
 
-in  vec3 pass_Normal;
-in  vec3 pass_Color;
-in  float pass_Glossyness;
-in  vec3 pass_lightRay;
-in  vec3 pass_Viewer;
+in vec3 pass_Normal;
+in vec3 pass_Color;
+in float pass_Glossyness;
+in vec3 pass_lightRay;
+in vec3 pass_Viewer;
+in vec2 pass_texCoord;
 flat in uint  pass_Shader; 
 
 
 out  vec4 out_Color;
 
 void main() {
-	vec3 ka = pass_Color;
-	vec3 kd = pass_Color;
+	vec3 ka = vec3{pass_texCoord, 1.0};
+	vec3 kd = vec3{pass_texCoord, 1.0};
 	vec3 ks = vec3(1.0, 1.0, 1.0);
 
 	if(pass_Shader == uint(0)){

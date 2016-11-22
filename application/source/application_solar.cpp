@@ -192,6 +192,12 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 	glUseProgram(m_shaders.at("planet").handle);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+	int color_sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "ColorTex");
+	glUniform1i(color_sampler_location, textureHandle);
+
 	glm::fmat4 matrix;
 
 	matrix *= model_matrix(planet);
@@ -223,7 +229,7 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 // load models
 void ApplicationSolar::initializeGeometry() {
-	model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+	model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD);
 
 	// generate vertex array object
 	glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -246,6 +252,10 @@ void ApplicationSolar::initializeGeometry() {
 	// second attribute is 3 floats with no offset & stride
 	glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
 
+	glEnableVertexAttribArray(2);
+	// second attribute is 3 floats with no offset & stride
+	glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TEXCOORD]);
+
 	 // generate generic buffer
 	glGenBuffers(1, &planet_object.element_BO);
 	// bind this as an vertex array buffer containing all attributes
@@ -258,6 +268,7 @@ void ApplicationSolar::initializeGeometry() {
 	// transfer number of indices to model object 
 	planet_object.num_elements = GLsizei(planet_model.indices.size());
 
+	initializeTextures();
 
 	// STARS
 	//rand num of stars
@@ -379,6 +390,34 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	solarSystem.push_back(Moon);
 
 	return solarSystem;
+}
+
+void ApplicationSolar::initializeTextures(){
+	std::string path = m_resource_path + "textures/";
+
+	auto sun = texture_loader::file(path + "sunmap.jpg");
+	auto mercury = texture_loader::file(path + "mercurymap.jpg");
+	auto venus = texture_loader::file(path + "venusmap.jpg");
+	auto earth = texture_loader::file(path + "earthmap1k.jpg");
+	auto mars = texture_loader::file(path + "mars_1k_color.jpg");
+	auto jupiter = texture_loader::file(path + "jupitermap.jpg");
+	auto saturn = texture_loader::file(path + "saturnmap.jpg");
+	auto uranus = texture_loader::file(path + "uranusmap.jpg");
+	auto neptune = texture_loader::file(path + "netunemap.jpg");
+	auto pluto = texture_loader::file(path + "plutomap1k.jpg");
+	auto moon = texture_loader::file(path + "moonmap1k.jpg");
+
+	textures.push_back(utils::create_texture_object(sun));
+	textures.push_back(utils::create_texture_object(mercury));
+	textures.push_back(utils::create_texture_object(venus));
+	textures.push_back(utils::create_texture_object(earth));
+	textures.push_back(utils::create_texture_object(mars));
+	textures.push_back(utils::create_texture_object(jupiter));
+	textures.push_back(utils::create_texture_object(saturn));
+	textures.push_back(utils::create_texture_object(uranus));
+	textures.push_back(utils::create_texture_object(neptune));
+	textures.push_back(utils::create_texture_object(pluto));
+	textures.push_back(utils::create_texture_object(moon));
 
 }
 
