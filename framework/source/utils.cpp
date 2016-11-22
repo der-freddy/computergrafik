@@ -15,7 +15,7 @@ namespace utils {
 texture_object create_texture_object(pixel_data const& tex) {
   texture_object t_obj{};
 
-  glGenTextures(1, &textureHandle);
+  glGenTextures(1, textureHandle);
   glBindTexture(GL_TEXTURE_2D, textureHandle);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLint(GL_LINEAR));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLint(GL_LINEAR));

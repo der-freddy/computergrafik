@@ -21,6 +21,7 @@ struct Planet{
     color_ = color;
     ref_pl_ = ref_pl;
     glossyness_ = glossyness;
+    path_ = path;
 
   }
 
@@ -31,6 +32,7 @@ struct Planet{
   glm::fvec3 color_;
   std::shared_ptr<Planet> ref_pl_;
   float glossyness_;
+  std::string path_;
 
 };
 
