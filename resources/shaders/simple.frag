@@ -5,15 +5,18 @@ in vec3 pass_Color;
 in float pass_Glossyness;
 in vec3 pass_lightRay;
 in vec3 pass_Viewer;
-in vec2 pass_texCoord;
+in vec2 pass_TexCoord;
 flat in uint  pass_Shader; 
 
+uniform sampler2D ColorTex;
 
 out  vec4 out_Color;
 
 void main() {
-	vec3 ka = vec3{pass_texCoord, 1.0};
-	vec3 kd = vec3{pass_texCoord, 1.0};
+	vec4 color = texture(ColorTex, pass_TexCoord);
+
+	vec3 ka = vec3(color.x, color.y, color.z);
+	vec3 kd = vec3(color.x, color.y, color.z);
 	vec3 ks = vec3(1.0, 1.0, 1.0);
 
 	if(pass_Shader == uint(0)){

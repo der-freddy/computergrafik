@@ -30,20 +30,16 @@ class ApplicationSolar : public Application {
   std::vector<std::shared_ptr<Planet>> create_scene() const;
 
 
-  void uploadPlanetTransforms(std::shared_ptr<Planet> const& planet) const;
+  void uploadPlanetTransforms(std::shared_ptr<Planet> const& planet, int const& i) const;
 
   //Update shader
   void updateShader(uint shader);
 
  protected:
   void initializeShaderPrograms();
-  void initializeTextures();
   void initializeGeometry();
-  void initializeTextures();
+  void initializeTextures(std::vector<std::shared_ptr<Planet>>);
   void updateView();
-
-  GLuint textureHandle;
-  std::vector<texture_object> textures;
 
   // cpu representation of model
   model_object planet_object;
@@ -53,9 +49,6 @@ class ApplicationSolar : public Application {
   std::vector<float> stars;
   std::vector<unsigned> num_stars;
   std::string shadername = "planet";
-
-  std::vector<texture_object> textures;
-  GLuint texture_handle;
 };
 
 #endif

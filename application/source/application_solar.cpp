@@ -27,12 +27,10 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,planets{}
  ,stars{}
  ,num_stars{}
- ,textures{}
 {
 
 	initializeGeometry();
 	initializeShaderPrograms();
-	initializeTextures();
 
 	planets = create_scene();
 
@@ -51,7 +49,7 @@ void ApplicationSolar::render() const {
 
 	for(std::vector<std::shared_ptr<Planet>>::const_iterator i = planets.begin(); i != planets.end(); ++i)
   	{
-    	uploadPlanetTransforms(*i);
+    	uploadPlanetTransforms(*i, i-planets.begin());
   	}
 
 	glUseProgram(m_shaders.at("planet").handle);
@@ -176,8 +174,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 	m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 	m_shaders.at("planet").u_locs["PlanetColor"] = -1;
 	m_shaders.at("planet").u_locs["Glossyness"] = -1;
-
-
+ 
 	m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
 																					 m_resource_path + "shaders/star.frag"});
 	//inizialise star shader
@@ -188,18 +185,18 @@ void ApplicationSolar::initializeShaderPrograms() {
   	m_shaders.at("star").u_locs["ProjectionMatrix"] = -1;
 }
 
-void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& planet) const{
+void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& planet, int const& i) const{
 
 	glUseProgram(m_shaders.at("planet").handle);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glActiveTexture(GL_TEXTURE0+i);
+	glBindTexture(planet->texObj_.target, planet->texObj_.handle);
 
 	int color_sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "ColorTex");
-	glUniform1i(color_sampler_location, textureHandle);
+	glUniform1i(color_sampler_location, i);
 
 	glm::fmat4 matrix;
-
+ 
 	matrix *= model_matrix(planet);
 
 
@@ -268,8 +265,6 @@ void ApplicationSolar::initializeGeometry() {
 	// transfer number of indices to model object 
 	planet_object.num_elements = GLsizei(planet_model.indices.size());
 
-	initializeTextures();
-
 	// STARS
 	//rand num of stars
 	const unsigned numstars = 5000+(std::rand()%(10000-5000+1));
@@ -318,36 +313,6 @@ void ApplicationSolar::initializeGeometry() {
 	star_object.num_elements = GLsizei(numstars);
 }
 
-void ApplicationSolar::initializeTextures()
-{
-	std::string texturesDir = m_resource_path+"textures/";
-
-	auto tSun = texture_loader::file(texturesDir+"sunmap.jpg");
-	auto tMercury = texture_loader::file(texturesDir+"mercurymap.jpg");
-	auto tVenus = texture_loader::file(texturesDir+"venusmap.jpg");
-	auto tEarth = texture_loader::file(texturesDir+"earthmap1k.jpg");
-	auto tMars = texture_loader::file(texturesDir+"mars_1k_color.jpg");
-	auto tJupiter = texture_loader::file(texturesDir+"jupitermap.jpg");
-	auto tSaturn = texture_loader::file(texturesDir+"saturnmap.jpg");
-	auto tUranus = texture_loader::file(texturesDir+"uranusmap.jpg");
-	auto tNeptune = texture_loader::file(texturesDir+"neptunemap.jpg");
-	auto tPluto = texture_loader::file(texturesDir+"plutomap1k.jpg");
-	auto tMoon = texture_loader::file(texturesDir+"moonmap1k.jpg");
-
-	textures.push_back(utils::create_texture_object(tSun));
-	textures.push_back(utils::create_texture_object(tMercury));
-	textures.push_back(utils::create_texture_object(tVenus));
-	textures.push_back(utils::create_texture_object(tEarth));
-	textures.push_back(utils::create_texture_object(tMars));
-	textures.push_back(utils::create_texture_object(tJupiter));
-	textures.push_back(utils::create_texture_object(tSaturn));
-	textures.push_back(utils::create_texture_object(tUranus));
-	textures.push_back(utils::create_texture_object(tPluto));
-	textures.push_back(utils::create_texture_object(tMoon));
-
-
-}
-
 ApplicationSolar::~ApplicationSolar() {
 	glDeleteBuffers(1, &planet_object.vertex_BO);
 	glDeleteBuffers(1, &planet_object.element_BO);
@@ -360,19 +325,34 @@ ApplicationSolar::~ApplicationSolar() {
 }
 
 std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
+
+	std::string tPath = m_resource_path + "textures/";
+
+	auto tSun = utils::create_texture_object(texture_loader::file(tPath + "sunmap.png"));
+	auto tMercury = utils::create_texture_object(texture_loader::file(tPath + "mercurymap.png"));
+	auto tVenus = utils::create_texture_object(texture_loader::file(tPath + "venusmap.png"));
+	auto tEarth = utils::create_texture_object(texture_loader::file(tPath + "earthmap1k.png"));
+	auto tMars = utils::create_texture_object(texture_loader::file(tPath + "marsmap1k.png"));
+	auto tJupiter = utils::create_texture_object(texture_loader::file(tPath + "jupitermap.png"));
+	auto tSaturn = utils::create_texture_object(texture_loader::file(tPath + "saturnmap.png"));
+	auto tUranus = utils::create_texture_object(texture_loader::file(tPath + "uranusmap.png"));	
+	auto tNeptune = utils::create_texture_object(texture_loader::file(tPath + "neptunemap.png"));
+	auto tPluto = utils::create_texture_object(texture_loader::file(tPath + "moonmap1k.png"));
+	auto tMoon = utils::create_texture_object(texture_loader::file(tPath + "moonmap1k.png"));
+
 	//create planets & moons
 
-	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{1.0, 0.5, 0.2}, 6.0f, nullptr,"sunmap.png");
-	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.2, 0.2, 0.6}, 6.0f,Sun,"mercurymap.png");
-	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.1, 0.5, 0.2}, 6.0f,Sun,"venusmap.png");
-	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.7, 0.2, 0.4}, 6.5f, Sun,"earthmap1k.png");
-	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.8, 0.1, 0.7}, 6.0f, Sun,"mars_1k_color.png");
-	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.9, 0.1, 0.4}, 6.0f, Sun,"jupitermap.png");
-	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.6, 0.9, 0.3}, 6.0f, Sun,"saturnmap.png");
-	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, glm::vec3{0.2, 0.1, 0.9}, 6.0, Sun,"uranusmap.png");
-	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.4, 0.8, 0.9}, 6.0f, Sun,"neptunemap.png");
-	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 6.0f, Sun,"plutomap1k.png");
-	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.4, 0.4, 0.4}, 6.0f, Earth,"moonmap1k.png");
+	std::shared_ptr<Planet> Sun = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.5, 0.5, 0.5}, 0.15f, glm::vec3{1.0, 0.5, 0.2}, 6.0f, nullptr,tSun);
+	std::shared_ptr<Planet> Mercury = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, glm::vec3{0.1, 0.1, 0.1}, 0.5f, glm::vec3{0.2, 0.2, 0.6}, 6.0f,Sun,tMercury);
+	std::shared_ptr<Planet> Venus = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{2.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 1.0f, glm::vec3{0.1, 0.5, 0.2}, 6.0f,Sun,tVenus);
+	std::shared_ptr<Planet> Earth = std::make_shared <Planet>(glm::vec3{0.0f, 4.0f, 0.0f}, glm::vec3{3.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.9f, glm::vec3{0.7, 0.2, 0.4}, 6.5f, Sun,tEarth);
+	std::shared_ptr<Planet> Mars = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{4.0f, 0.0f, 0.0f}, glm::vec3{0.09, 0.09, 0.09}, 0.8f, glm::vec3{0.8, 0.1, 0.7}, 6.0f, Sun,tMars);
+	std::shared_ptr<Planet> Jupiter = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{0.15, 0.15, 0.15}, 0.6f, glm::vec3{0.9, 0.1, 0.4}, 6.0f, Sun,tJupiter);
+	std::shared_ptr<Planet> Saturn = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{6.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.3f, glm::vec3{0.6, 0.9, 0.3}, 6.0f, Sun,tSaturn);
+	std::shared_ptr<Planet> Uranus = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{7.0f, 0.0f, 0.0f}, glm::vec3{0.13, 0.13, 0.13}, 0.7f, glm::vec3{0.2, 0.1, 0.9}, 6.0, Sun,tUranus);
+	std::shared_ptr<Planet> Neptune = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{8.0f, 0.0f, 0.0f}, glm::vec3{0.12, 0.12, 0.12}, 0.55f, glm::vec3{0.4, 0.8, 0.9}, 6.0f, Sun,tNeptune);
+	std::shared_ptr<Planet> Pluto = std::make_shared <Planet>(glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{9.0f, 0.0f, 0.0f}, glm::vec3{0.05, 0.05, 0.05}, 0.7f, glm::vec3{0.5, 0.5, 0.5}, 6.0f, Sun,tPluto);
+	std::shared_ptr<Planet> Moon = std::make_shared <Planet>(glm::vec3{0.0f, 3.0f, 0.0f}, glm::vec3{0.5f, 0.0f, 0.0f}, glm::vec3{0.03, 0.03, 0.03}, 0.4f, glm::vec3{0.4, 0.4, 0.4}, 6.0f, Earth,tMoon);
 
 	//put planets in vector
 	std::vector<std::shared_ptr<Planet>> solarSystem;
@@ -390,35 +370,6 @@ std::vector<std::shared_ptr<Planet>> ApplicationSolar::create_scene() const{
 	solarSystem.push_back(Moon);
 
 	return solarSystem;
-}
-
-void ApplicationSolar::initializeTextures(){
-	std::string path = m_resource_path + "textures/";
-
-	auto sun = texture_loader::file(path + "sunmap.jpg");
-	auto mercury = texture_loader::file(path + "mercurymap.jpg");
-	auto venus = texture_loader::file(path + "venusmap.jpg");
-	auto earth = texture_loader::file(path + "earthmap1k.jpg");
-	auto mars = texture_loader::file(path + "mars_1k_color.jpg");
-	auto jupiter = texture_loader::file(path + "jupitermap.jpg");
-	auto saturn = texture_loader::file(path + "saturnmap.jpg");
-	auto uranus = texture_loader::file(path + "uranusmap.jpg");
-	auto neptune = texture_loader::file(path + "netunemap.jpg");
-	auto pluto = texture_loader::file(path + "plutomap1k.jpg");
-	auto moon = texture_loader::file(path + "moonmap1k.jpg");
-
-	textures.push_back(utils::create_texture_object(sun));
-	textures.push_back(utils::create_texture_object(mercury));
-	textures.push_back(utils::create_texture_object(venus));
-	textures.push_back(utils::create_texture_object(earth));
-	textures.push_back(utils::create_texture_object(mars));
-	textures.push_back(utils::create_texture_object(jupiter));
-	textures.push_back(utils::create_texture_object(saturn));
-	textures.push_back(utils::create_texture_object(uranus));
-	textures.push_back(utils::create_texture_object(neptune));
-	textures.push_back(utils::create_texture_object(pluto));
-	textures.push_back(utils::create_texture_object(moon));
-
 }
 
 // exe entry point

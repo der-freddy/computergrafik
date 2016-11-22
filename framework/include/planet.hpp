@@ -12,7 +12,9 @@
 using namespace gl;
 
 struct Planet{
-  Planet(glm::fvec3 rotation = glm::fvec3(), glm::fvec3 translation = glm::fvec3(), glm::fvec3 scale = glm::fvec3(), double rotationSpeed = 1.0f, glm::vec3 color = glm::fvec3(), float glossyness = 1.0f, std::shared_ptr<Planet> ref_pl = nullptr)
+  Planet(glm::fvec3 rotation = glm::fvec3(), glm::fvec3 translation = glm::fvec3(), glm::fvec3 scale = glm::fvec3(), 
+    double rotationSpeed = 1.0f, glm::vec3 color = glm::fvec3(), float glossyness = 1.0f, 
+    std::shared_ptr<Planet> ref_pl = nullptr, texture_object texObj = texture_object())
   {
     rotation_ = rotation;
     translation_ = translation;
@@ -21,7 +23,7 @@ struct Planet{
     color_ = color;
     ref_pl_ = ref_pl;
     glossyness_ = glossyness;
-    path_ = path;
+    texObj_ = texObj;
 
   }
 
@@ -32,7 +34,7 @@ struct Planet{
   glm::fvec3 color_;
   std::shared_ptr<Planet> ref_pl_;
   float glossyness_;
-  std::string path_;
+  texture_object texObj_;
 
 };
 
