@@ -3,6 +3,7 @@
 
 uniform sampler2D ColorTex;
 
+
 uniform uint Lum;
 uniform uint Hor;
 uniform uint Vert;
@@ -13,6 +14,7 @@ out vec4 out_Color;
 
 void main(void)
 {
+
 	float x = pass_TexCoord.x;
 	float y = pass_TexCoord.y;
 	out_Color = texture(ColorTex, pass_TexCoord);
@@ -34,5 +36,4 @@ void main(void)
 
 		out_Color = vec4(Lum,Lum, Lum, 1.0f);
 	}
-
 }
