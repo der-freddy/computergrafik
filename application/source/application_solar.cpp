@@ -177,6 +177,56 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
 
 		updateShader(1);
 	}
+	else if(key == GLFW_KEY_7 && action == GLFW_PRESS)
+	{ 
+	    if (lum == 0){
+			lum = 1;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Lum");
+			glUniform1ui(loc, lum);
+	    }
+	    else
+	    {
+			lum = 0;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Lum");
+			glUniform1ui(loc, lum);
+		}
+	}
+	else if(key == GLFW_KEY_8 && action == GLFW_PRESS)
+	{
+		if (hor == 0)
+		{
+			hor = 1;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Hor");
+			glUniform1ui(loc, hor);
+		}
+		else
+		{
+			hor = 0;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Hor");
+			glUniform1ui(loc, hor);
+		}
+	}
+	else if(key == GLFW_KEY_9 && action == GLFW_PRESS)
+	{ 
+		if (vert == 0)
+		{
+			vert = 1;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Vert");
+			glUniform1ui(loc, vert);
+		}
+		else
+		{
+			vert = 0;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Vert");
+			glUniform1ui(loc, vert);
+		}
+	}
 }
 
 void ApplicationSolar::updateShader(uint shader) {
