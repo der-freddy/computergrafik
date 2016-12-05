@@ -20,6 +20,8 @@ using namespace gl;
 
 #include <iostream>
 
+
+
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
@@ -27,8 +29,12 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,planets{}
  ,stars{}
  ,num_stars{}
+ ,sqo{}
 {
-
+	glEnable(GL_DEPTH_TEST);
+  	glDepthFunc(GL_LESS);	
+	initializeFramebuffer(600u,450u);
+	createScreenQuad();
 	initializeGeometry();
 	initializeShaderPrograms();
 
@@ -38,6 +44,11 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 
 void ApplicationSolar::render() const {
 
+	glBindFramebuffer(GL_FRAMEBUFFER, fb_handle);
+
+	glClearColor(0.0,0.0,0.0,0.0);
+	glClearDepth(1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(m_shaders.at("star").handle);
 
@@ -52,13 +63,32 @@ void ApplicationSolar::render() const {
     	uploadPlanetTransforms(*i, i-planets.begin());
   	}
 
-	glUseProgram(m_shaders.at("planet").handle);
+
+//	glUseProgram(m_shaders.at("planet").handle);
 
 	// bind the VAO to draw
-	glBindVertexArray(planet_object.vertex_AO);
+//	glBindVertexArray(planet_object.vertex_AO);
 
 	// draw bound vertex array using bound shader
-	glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+//	glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(m_shaders.at("screenquad").handle);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, to.handle);
+	int color_location = glGetUniformLocation(m_shaders.at("screenquad").handle, "ColorTex");
+	glUniform1i(color_location, 0);
+
+	glBindVertexArray(sqo.vertex_AO);
+	utils::validate_program(m_shaders.at("screenquad").handle);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+
+
 	
 }
 
@@ -66,6 +96,7 @@ void ApplicationSolar::updateView() {
 
 	// vertices are transformed in camera space, so camera transform must be inverted
 	glm::fmat4 view_matrix = glm::inverse(m_view_transform);
+	glUseProgram(m_shaders.at("planet").handle);
 
 	// upload matrix to gpu
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ViewMatrix"),
@@ -86,6 +117,8 @@ void ApplicationSolar::updateView() {
 }
 
 void ApplicationSolar::updateProjection() {
+
+	initializeFramebuffer(600u,450u);
 	// upload matrix to gpu
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ProjectionMatrix"),
 										 1, GL_FALSE, glm::value_ptr(m_view_projection));
@@ -172,8 +205,10 @@ void ApplicationSolar::initializeShaderPrograms() {
 	m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
 	m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
 	m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
-	m_shaders.at("planet").u_locs["PlanetColor"] = -1;
+	//m_shaders.at("planet").u_locs["PlanetColor"] = -1;
 	m_shaders.at("planet").u_locs["Glossyness"] = -1;
+	m_shaders.at("planet").u_locs["ColorTex"] = -1;
+
 
 
 	m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
@@ -184,6 +219,9 @@ void ApplicationSolar::initializeShaderPrograms() {
   	//m_shaders.at("star").u_locs["ModelMatrix"] = -1;
   	m_shaders.at("star").u_locs["ViewMatrix"] = -1;
   	m_shaders.at("star").u_locs["ProjectionMatrix"] = -1;
+
+	m_shaders.emplace("screenquad", shader_program{m_resource_path + "shaders/screenquad.vert",m_resource_path + "shaders/screenquad.frag"});
+
 }
 
 void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& planet, int const& i) const{
@@ -211,7 +249,8 @@ void ApplicationSolar::uploadPlanetTransforms(std::shared_ptr<Planet> const& pla
 
 	glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),1, GL_FALSE, glm::value_ptr(normal_matrix));
 
-	glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"), planet->color_.x,planet->color_.y, planet->color_.z); 
+	auto loc = glGetUniformLocation(m_shaders.at("planet").handle,"PlanetColor");
+	glUniform3f(loc, planet->color_.x,planet->color_.y, planet->color_.z); 
 
 
 	glUniform1f(m_shaders.at("planet").u_locs.at("Glossyness"), planet->glossyness_); 
@@ -312,6 +351,71 @@ void ApplicationSolar::initializeGeometry() {
 	//draw stars
 	star_object.draw_mode = GL_POINTS;
 	star_object.num_elements = GLsizei(numstars);
+}
+
+void ApplicationSolar::initializeFramebuffer(unsigned int width, unsigned int height)
+{
+
+	GLuint rb_handle = 0;
+
+	glGenRenderbuffers(1, &rb_handle);
+	glBindRenderbuffer(GL_RENDERBUFFER, rb_handle);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT24,width,height);
+
+	
+	//Textures without colors
+	glGenTextures(1, &to.handle);
+	glBindTexture(GL_TEXTURE_2D, to.handle);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GLint(GL_RGB), width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glGenFramebuffers(1, &fb_handle);
+  	glBindFramebuffer(GL_FRAMEBUFFER, fb_handle);
+
+  	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, to.handle,0);
+  	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb_handle);
+
+  	GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+  	glDrawBuffers(1, draw_buffers);
+
+  	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  	if (status != GL_FRAMEBUFFER_COMPLETE) {
+    	std::cout << "Erorr in frame buffer" << std::endl;
+  	}
+  }
+
+void ApplicationSolar::createScreenQuad(){
+  
+  std::vector<float> vertices {
+          -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, // v1
+           1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // v2
+          -1.0f,  1.0f, 0.0f, 0.0f, 1.0f, // v4
+           1.0f,  1.0f, 0.0f, 1.0f, 1.0f  // v3
+         };
+  
+  model sqm = {vertices, model::POSITION | model::TEXCOORD};
+  // generate vertex array object
+  glGenVertexArrays(1, &sqo.vertex_AO);
+  // bind the array for attaching buffers
+  glBindVertexArray(sqo.vertex_AO);
+
+  // generate generic buffer
+  glGenBuffers(1, &sqo.vertex_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ARRAY_BUFFER, sqo.vertex_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sqm.data.size(), sqm.data.data(), GL_STATIC_DRAW);
+
+  // activate first attribute on gpu
+  glEnableVertexAttribArray(0);
+  // first attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, sqm.vertex_bytes, sqm.offsets[model::POSITION]);
+  // activate second attribute on gpu
+  glEnableVertexAttribArray(1);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, sqm.vertex_bytes, sqm.offsets[model::TEXCOORD]);
 }
 
 ApplicationSolar::~ApplicationSolar() {

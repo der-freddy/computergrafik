@@ -39,6 +39,8 @@ class ApplicationSolar : public Application {
   void initializeShaderPrograms();
   void initializeGeometry();
   void initializeTextures(std::vector<std::shared_ptr<Planet>>);
+  void initializeFramebuffer(unsigned int height,unsigned int width);
+  void createScreenQuad();
   void updateView();
 
   // cpu representation of model
@@ -49,6 +51,16 @@ class ApplicationSolar : public Application {
   std::vector<float> stars;
   std::vector<unsigned> num_stars;
   std::string shadername = "planet";
+
+  //SCREEN SQUAD
+  model_object sqo;
+  texture_object to{};
+  GLuint fb_handle;
+
+  int lum = 0;
+  int vert = 0;
+  int hor = 0;
+  int gau = 0;
 };
 
 #endif
