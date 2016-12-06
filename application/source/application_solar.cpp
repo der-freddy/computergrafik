@@ -227,6 +227,23 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
 			glUniform1ui(loc, vert);
 		}
 	}
+	else if(key == GLFW_KEY_0 && action == GLFW_PRESS)
+	{ 
+		if (gau == 0)
+		{
+			gau = 1;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Gau");
+			glUniform1ui(loc, gau);
+		}
+		else
+		{
+			gau = 0;
+			glUseProgram(m_shaders.at("screenquad").handle);
+			auto loc = glGetUniformLocation(m_shaders.at("screenquad").handle, "Gau");
+			glUniform1ui(loc, gau);
+		}
+	}
 }
 
 void ApplicationSolar::updateShader(uint shader) {

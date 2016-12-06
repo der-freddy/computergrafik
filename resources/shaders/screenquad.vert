@@ -3,7 +3,7 @@
 
 // vertex attributes of VAO
 layout(location = 0) in vec3 in_Position;
-layout(location = 1) in vec2 in_Texcoord;
+layout(location = 1) in vec2 in_TexCoord;
 
 out vec2 pass_TexCoord;
 
